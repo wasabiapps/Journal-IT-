@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Journal - Периодика для айтишников</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Добавляем стили для сплэшскрина */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .splash-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: splashAppear 1.5s ease-out;
+        }
+        
+        @keyframes splashAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .splash-title {
+            font-size: 4rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+            animation: titleGlow 2s infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+                text-shadow: 0 4px 20px rgba(255, 255, 255, 0.2), 0 0 30px rgba(52, 152, 219, 0.4);
+            }
+        }
+        
+        .splash-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 40px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            opacity: 0;
+            animation: subtitleFadeIn 1s ease-out 1s forwards;
+        }
+        
+        @keyframes subtitleFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .splash-copyright {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            opacity: 0;
+            animation: copyrightFadeIn 1s ease-out 1.5s forwards;
+        }
+        
+        @keyframes copyrightFadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.7;
+            }
+        }
+        
+        .splash-loader {
+            width: 60px;
+            height: 60px;
+            margin-top: 30px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            opacity: 0;
+            animation: loaderFadeIn 1s ease-out 0.5s forwards, spin 1s linear infinite 1.5s;
+        }
+        
+        @keyframes loaderFadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        /* Остальные существующие стили остаются без изменений */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --ad-color-primary: #667eea;
+            --ad-color-secondary: #764ba2;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Шапка */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+        }
+
+        /* Кнопка меню */
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .menu-toggle:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Боковое меню */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 99;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 98;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-title {
+            padding: 0 25px 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #555;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #f0f7ff;
+            color: var(--secondary-color);
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 21px;
+        }
+
+        .nav-icon {
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-text {
+            font-weight: 500;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Стили для рекламных баннеров (УМЕНЬШЕНЫ ВДВОЕ) */
+        .ad-banner {
+            background: linear-gradient(135deg, var(--ad-color-primary) 0%, var(--ad-color-secondary) 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 12px; /* Уменьшено с 20px */
+            margin: 15px 0; /* Уменьшено с 25px */
+            text-align: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1); /* Уменьшено */
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-width: 100%;
+        }
+
+        .ad-banner:hover {
+            transform: translateY(-2px); /* Уменьшено с -3px */
+            box-shadow: 0 5px 12px rgba(0,0,0,0.12); /* Уменьшено */
+        }
+
+        .ad-banner::before {
+            content: '';
+            position: absolute;
+            top: -40%; /* Уменьшено */
+            right: -40%; /* Уменьшено */
+            width: 150px; /* Уменьшено с 200px */
+            height: 150px; /* Уменьшено с 200px */
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: adPulse 8s infinite linear;
+        }
+
+        @keyframes adPulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.1); /* Уменьшено с 1.2 */
+                opacity: 0.2;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+        }
+
+        .ad-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .ad-badge {
+            display: inline-block;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            padding: 3px 8px; /* Уменьшено */
+            border-radius: 15px; /* Уменьшено */
+            font-size: 0.7rem; /* Уменьшено */
+            font-weight: 600;
+            margin-bottom: 6px; /* Уменьшено */
+            backdrop-filter: blur(5px);
+        }
+
+        .ad-title {
+            font-size: 1.1rem; /* Уменьшено с 1.4rem */
+            font-weight: 700;
+            margin-bottom: 8px; /* Уменьшено */
+        }
+
+        .ad-description {
+            font-size: 0.9rem; /* Уменьшено с 1rem */
+            margin-bottom: 15px; /* Уменьшено с 20px */
+            opacity: 0.9;
+            line-height: 1.4;
+            max-height: 3.6em; /* Ограничиваем высоту */
+            overflow: hidden;
+        }
+
+        .ad-button {
+            display: inline-block;
+            background-color: white;
+            color: var(--ad-color-primary);
+            padding: 6px 16px; /* Уменьшено */
+            border-radius: 40px; /* Уменьшено */
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem; /* Уменьшено */
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* Уменьшено */
+        }
+
+        .ad-button:hover {
+            background-color: #f8f9fa;
+            color: var(--ad-color-secondary);
+            transform: translateY(-1px); /* Уменьшено */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12); /* Уменьшено */
+        }
+
+        .ad-button i {
+            margin-right: 6px; /* Уменьшено */
+            font-size: 0.8rem; /* Уменьшено */
+        }
+
+        /* Стиль для маленького баннера (ЕЩЕ МЕНЬШЕ) */
+        .ad-banner-small {
+            padding: 10px; /* Уменьшено с 15px */
+            margin: 10px 0; /* Уменьшено с 15px */
+        }
+
+        .ad-banner-small .ad-title {
+            font-size: 1rem; /* Уменьшено с 1.2rem */
+        }
+
+        .ad-banner-small .ad-description {
+            font-size: 0.8rem; /* Уменьшено с 0.9rem */
+            margin-bottom: 10px; /* Уменьшено с 15px */
+            max-height: 2.8em; /* Еще меньше */
+        }
+
+        .ad-banner-small .ad-button {
+            padding: 5px 14px; /* Уменьшено */
+            font-size: 0.8rem; /* Уменьшено */
+        }
+
+        /* Стиль для бокового баннера */
+        .ad-banner-sidebar {
+            margin: 15px; /* Уменьшено с 20px */
+            padding: 12px; /* Уменьшено с 15px */
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        /* Основной контент */
+        .main-content {
+            padding: calc(var(--header-height) + 20px) 30px 30px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            font-size: 2rem;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .article-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .article-image {
+            height: 180px;
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .article-content {
+            padding: 20px;
+        }
+
+        .article-category {
+            display: inline-block;
+            background-color: #e1f0ff;
+            color: var(--secondary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .article-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .article-excerpt {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Стили для детского раздела */
+        .kids-category {
+            background-color: #fff9e6;
+        }
+
+        .kids-category .article-category {
+            background-color: #ffeb99;
+            color: #e67e22;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #777;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .modal-image {
+            height: 300px;
+            width: 100%;
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-category {
+            display: inline-block;
+            background-color: #e1f0ff;
+            color: var(--secondary-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 20px;
+            color: #777;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 25px;
+        }
+
+        .modal-text p {
+            margin-bottom: 15px;
+        }
+
+        .modal-text ul, .modal-text ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-text li {
+            margin-bottom: 8px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .modal-btn-secondary {
+            background-color: #f0f0f0;
+            color: #555;
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Загрузчик */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #777;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .loader i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Футер */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Адаптивность */
+        @media (min-width: 992px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+            
+            .sidebar-overlay {
+                display: none;
+            }
+            
+            .menu-toggle {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-width);
+            }
+        }
+
+        @media (max-width: 991px) {
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .modal-content {
+                max-height: 95vh;
+                margin: 10px;
+            }
+            
+            .modal-title {
+                font-size: 1.5rem;
+            }
+            
+            .modal-image {
+                height: 200px;
+            }
+            
+            .ad-banner {
+                margin: 15px 0; /* Уменьшено */
+            }
+            
+            /* Адаптивность для сплэшскрина */
+            .splash-title {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .ad-banner {
+                padding: 10px; /* Уменьшено */
+            }
+            
+            .ad-title {
+                font-size: 1rem; /* Уменьшено */
+            }
+            
+            .ad-description {
+                font-size: 0.85rem; /* Уменьшено */
+            }
+            
+            .ad-banner-small {
+                padding: 8px; /* Еще меньше на мобильных */
+            }
+            
+            /* Адаптивность для сплэшскрина */
+            .splash-title {
+                font-size: 2.5rem;
+            }
+            
+            .splash-subtitle {
+                font-size: 1rem;
+                text-align: center;
+                padding: 0 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .splash-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Сплашскрин -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-logo">
+            <div class="splash-title">Журнал IT+</div>
+            <div class="splash-subtitle">Периодика для IT-специалистов и всех, кто интересуется цифровыми технологиями</div>
+            <div class="splash-loader"></div>
+        </div>
+        <div class="splash-copyright">Wasabiapps 2015-2026</div>
+    </div>
+
+    <!-- Шапка -->
+    <header>
+        <div class="logo">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <i class="fas fa-laptop-code logo-icon"></i>
+            <h1>IT Journal</h1>
+        </div>
+        <div>
+            <button class="menu-toggle">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="menu-toggle">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Боковое меню -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-section">
+            <div class="nav-title">Основные разделы</div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="home">
+                    <div class="nav-icon"><i class="fas fa-home"></i></div>
+                    <div class="nav-text">Главная</div>
+                </li>
+                <li class="nav-item" data-page="news">
+                    <div class="nav-icon"><i class="fas fa-newspaper"></i></div>
+                    <div class="nav-text">Новости IT</div>
+                    <div class="nav-badge">24</div>
+                </li>
+                <li class="nav-item" data-page="development">
+                    <div class="nav-icon"><i class="fas fa-code"></i></div>
+                    <div class="nav-text">Разработка</div>
+                </li>
+                <li class="nav-item" data-page="ai">
+                    <div class="nav-icon"><i class="fas fa-robot"></i></div>
+                    <div class="nav-text">Искусственный интеллект</div>
+                    <div class="nav-badge">12</div>
+                </li>
+                <li class="nav-item" data-page="security">
+                    <div class="nav-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="nav-text">Кибербезопасность</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Для детей и начинающих</div>
+            <ul class="nav-menu">
+                <li class="nav-item" data-page="kids">
+                    <div class="nav-icon"><i class="fas fa-child"></i></div>
+                    <div class="nav-text">Программирование для детей</div>
+                    <div class="nav-badge">8</div>
+                </li>
+                <li class="nav-item" data-page="scratch">
+                    <div class="nav-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="nav-text">Scratch и игровое обучение</div>
+                </li>
+                <li class="nav-item" data-page="robotics">
+                    <div class="nav-icon"><i class="fas fa-robot"></i></div>
+                    <div class="nav-text">Робототехника</div>
+                </li>
+                <li class="nav-item" data-page="career">
+                    <div class="nav-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="nav-text">Карьера в IT</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Дополнительно</div>
+            <ul class="nav-menu">
+                <li class="nav-item" data-page="events">
+                    <div class="nav-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="nav-text">Мероприятия</div>
+                </li>
+                <li class="nav-item" data-page="books">
+                    <div class="nav-icon"><i class="fas fa-book"></i></div>
+                    <div class="nav-text">Книги и ресурсы</div>
+                </li>
+                <li class="nav-item" data-page="about">
+                    <div class="nav-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="nav-text">О проекте</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Баннер в боковой панели -->
+        <div class="ad-banner ad-banner-sidebar">
+            <div class="ad-content">
+                <div class="ad-badge">Реклама</div>
+                <h3 class="ad-title">Wasabi Apps</h3>
+                <p class="ad-description">Лучшие приложения для разработчиков</p>
+                <a href="https://wasabiapps.youware.app" target="_blank" class="ad-button">
+                    <i class="fas fa-external-link-alt"></i> Посетить магазин
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="main-content" id="mainContent">
+        <h2 class="page-title" id="pageTitle">Главная - Последние публикации</h2>
+        
+        <!-- Главный баннер -->
+        <div class="ad-banner" id="mainBanner">
+            <div class="ad-content">
+                <div class="ad-badge">Рекомендуем</div>
+                <h2 class="ad-title">Wasabi Apps Store</h2>
+                <p class="ad-description">Откройте для себя мир качественных приложений для разработчиков, дизайнеров и IT-специалистов.</p>
+                <a href="https://wasabiapps.youware.app" target="_blank" class="ad-button">
+                    <i class="fas fa-shopping-bag"></i> Перейти в магазин приложений
+                </a>
+            </div>
+        </div>
+        
+        <!-- Индикатор загрузки -->
+        <div class="loader" id="loader">
+            <i class="fas fa-spinner"></i>
+            <p>Загрузка статей...</p>
+        </div>
+        
+        <div class="articles-grid" id="articlesGrid">
+            <!-- Статьи будут загружаться динамически -->
+        </div>
+        
+        <!-- Малый баннер после статей -->
+        <div class="ad-banner ad-banner-small">
+            <div class="ad-content">
+                <div class="ad-badge">Спонсор</div>
+                <h3 class="ad-title">Нужны инструменты для работы?</h3>
+                <p class="ad-description">Посетите Wasabi Apps Store для качественных IT-приложений</p>
+                <a href="https://wasabiapps.youware.app" target="_blank" class="ad-button">
+                    <i class="fas fa-external-link-alt"></i> Посмотреть
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Модальное окно для статьи -->
+    <div class="modal" id="articleModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-image" id="modalImage"></div>
+            <div class="modal-body">
+                <div class="modal-category" id="modalCategory"></div>
+                <h1 class="modal-title" id="modalTitle"></h1>
+                <div class="modal-meta">
+                    <span id="modalDate"></span>
+                    <span id="modalReadTime"></span>
+                    <span id="modalAuthor"></span>
+                </div>
+                <div class="modal-text" id="modalText">
+                    <!-- Текст статьи будет загружен динамически -->
+                </div>
+                
+                <!-- Баннер внутри модального окна -->
+                <div class="ad-banner ad-banner-small" style="margin: 20px 0;">
+                    <div class="ad-content">
+                        <div class="ad-badge">Партнер</div>
+                        <h4 class="ad-title">Понравилась статья?</h4>
+                        <p class="ad-description">Оцените наши рекомендации в Wasabi Apps Store</p>
+                        <a href="https://wasabiapps.youware.app" target="_blank" class="ad-button">
+                            <i class="fas fa-rocket"></i> Посетить магазин
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-primary" id="modalLike">
+                        <i class="fas fa-thumbs-up"></i> Нравится
+                    </button>
+                    <button class="modal-btn modal-btn-secondary" id="modalShare">
+                        <i class="fas fa-share-alt"></i> Поделиться
+                    </button>
+                    <button class="modal-btn modal-btn-secondary" id="modalSave">
+                        <i class="fas fa-bookmark"></i> Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <footer>
+        <div class="footer-content">
+            <p>IT Journal - Периодическое издание для IT-специалистов и всех, кто интересуется цифровыми технологиями</p>
+            <div class="footer-links">
+                <a href="#">О нас</a>
+                <a href="#">Контакты</a>
+                <a href="#">Реклама</a>
+                <a href="#">Политика конфиденциальности</a>
+                <a href="#">Подписаться на рассылку</a>
+            </div>
+            <p>&copy; 2015-2026 Wasabiapps| Журнал "IT+". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Добавляем функциональность для сплэшскрина
+        const splashScreen = document.getElementById('splashScreen');
+        
+        // Функция для скрытия сплэшскрина с задержкой
+        function hideSplashScreen() {
+            setTimeout(() => {
+                splashScreen.classList.add('hidden');
+                // Восстанавливаем скролл после скрытия сплэшскрина
+                document.body.style.overflow = 'auto';
+            }, 3000); // Задержка 3 секунды перед скрытием
+        }
+        
+        // Показываем сплэшскрин и запускаем таймер скрытия
+        document.addEventListener('DOMContentLoaded', () => {
+            // Блокируем скролл во время показа сплэшскрина
+            document.body.style.overflow = 'hidden';
+            
+            // Запускаем таймер скрытия сплэшскрина
+            hideSplashScreen();
+            
+            // Также можно скрыть сплэшскрин по клику
+            splashScreen.addEventListener('click', () => {
+                splashScreen.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Инициализация основного приложения
+            initializeApp();
+        });
+
+        // Расширенные данные статей для разных разделов
+        const articlesData = {
+            home: [
+                {id: 1, category: "Новости", title: "Тенденции IT-рынка в 2023 году", excerpt: "Анализ самых востребованных технологий и профессий в текущем году.", date: "15.10.2023", readTime: "5 мин", author: "Алексей Петров", image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                fullText: `<p>IT-рынок продолжает активно развиваться, несмотря на экономические колебания. В 2023 году мы наблюдаем несколько ключевых тенденций:</p>
+                <p><strong>1. Рост спроса на специалистов по кибербезопасности</strong> - с увеличением числа кибератак компании готовы инвестировать в защиту своих данных.</p>
+                <p><strong>2. Искусственный интеллект и машинное обучение</strong> проникают во все сферы бизнеса, от маркетинга до логистики.</p>
+                <p><strong>3. Low-code/No-code платформы</strong> позволяют создавать приложения без глубоких знаний программирования.</p>
+                <p><strong>4. Удаленная работа</strong> стала стандартом, что повысило спрос на специалистов по облачным технологиям и collaboration-инструментам.</p>
+                <p>По прогнозам аналитиков, наиболее востребованными в 2023-2024 годах будут:</p>
+                <ul>
+                    <li>Data Scientist</li>
+                    <li>DevOps инженер</li>
+                    <li>Cloud Architect</li>
+                    <li>AI/ML Engineer</li>
+                    <li>Cybersecurity Specialist</li>
+                </ul>`},
+                
+                {id: 2, category: "Разработка", title: "React 18: что нового?", excerpt: "Обзор новых возможностей и функций в последней версии популярного фреймворка.", date: "12.10.2023", readTime: "7 мин", author: "Мария Смирнова", image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                fullText: `<p>React 18 принес значительные улучшения в производительность и пользовательский опыт. Основные нововведения:</p>
+                <p><strong>Автоматическая пакетная обработка (Automatic Batching)</strong> - React теперь автоматически группирует обновления состояния, что уменьшает количество ререндеров.</p>
+                <p><strong>Новый root API</strong> - <code>ReactDOM.createRoot()</code> заменяет старый <code>ReactDOM.render()</code> и включает все улучшения React 18.</p>
+                <p><strong>Concurrent Features</strong> - позволяют React прерывать рендеринг для обработки более приоритетных задач, что делает интерфейсы более отзывчивыми.</p>
+                <p><strong>Новые хуки:</strong></p>
+                <ul>
+                    <li><code>useId</code> - генерация уникальных ID на клиенте и сервере</li>
+                    <li><code>useTransition</code> - пометка обновлений как несрочных</li>
+                    <li><code>useDeferredValue</code> - отложенное обновление значения</li>
+                    <li><code>useSyncExternalStore</code> - интеграция со сторонними хранилищами</li>
+                </ul>
+                <p><strong>Серверные компоненты (в альфа-версии)</strong> - позволяют рендерить компоненты на сервере, уменьшая размер бандла.</p>`},
+                
+                {id: 3, category: "Для детей", title: "Scratch: первый шаг в программирование", excerpt: "Как дети могут создавать свои первые игры и анимации с помощью Scratch.", date: "10.10.2023", readTime: "4 мин", author: "Ольга Иванова", image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", kids: true,
+                fullText: `<p>Scratch - это визуальный язык программирования, разработанный MIT для детей от 8 лет. Он позволяет создавать интерактивные истории, игры и анимации.</p>
+                <p><strong>Почему Scratch отлично подходит для детей:</strong></p>
+                <ul>
+                    <li>Интуитивный интерфейс с цветными блоками</li>
+                    <li>Нет необходимости писать код вручную</li>
+                    <li>Мгновенный визуальный результат</li>
+                    <li>Большое сообщество и готовые проекты для вдохновения</li>
+                </ul>
+                <p><strong>Первые шаги в Scratch:</strong></p>
+                <ol>
+                    <li>Зарегистрируйтесь на <a href="https://scratch.mit.edu" target="_blank">scratch.mit.edu</a></li>
+                    <li>Изучите интерфейс: сцена, спрайты, блоки кода</li>
+                    <li>Попробуйте создать простую анимацию: заставьте кота двигаться</li>
+                    <li>Добавьте интерактивность: управление с клавиатуры</li>
+                    <li>Создайте свою первую игру: "Ловля яблок"</li>
+                </ol>
+                <p><strong>Пример простого кода для движения:</strong></p>
+                <p>Когда ⚑ нажат:<br>
+                повторять всегда:<br>
+                идти 10 шагов<br>
+                если касается края, оттолкнуться</p>
+                <p>Scratch развивает логическое мышление, креативность и понимание алгоритмов!</p>`}
+            ],
+            
+            news: [
+                {id: 4, category: "Новости", title: "Новый iPhone и его влияние на рынок", excerpt: "Как последняя модель iPhone изменила подход к разработке мобильных приложений.", date: "17.10.2023", readTime: "4 мин", author: "Дмитрий Козлов", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                fullText: `<p>Новый iPhone 15 Pro с процессором A17 Pro и поддержкой ray tracing открывает новые возможности для разработчиков игр и приложений.</p>
+                <p><strong>Ключевые изменения для разработчиков:</strong></p>
+                <ul>
+                    <li>Поддержка аппаратного ray tracing - в 4 раза быстрее, чем программная реализация</li>
+                    <li>Новые возможности Metal API для более реалистичной графики</li>
+                    <li>Улучшенная энергоэффективность позволяет дольше работать с требовательными приложениями</li>
+                    <li>Поддержка стандарта USB-C открывает новые возможности для периферии</li>
+                </ul>
+                <p><strong>Влияние на рынок:</strong></p>
+                <p>Мобильные игры становятся все ближе к консольным по качеству графики. Ожидается волна новых игр, использующих возможности нового железа.</p>
+                <p>Разработчики должны обновить свои приложения для оптимальной работы с iOS 17 и новыми функциями iPhone 15.</p>`},
+                
+                {id: 5, category: "Новости", title: "Крупнейшая утечка данных 2023", excerpt: "Анализ инцидента с утечкой данных и уроки для компаний.", date: "15.10.2023", readTime: "5 мин", author: "Сергей Волков", image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                fullText: `<p>В сентябре 2023 года произошла одна из крупнейших утечек данных, затрагивающая более 100 миллионов пользователей по всему миру.</p>
+                <p><strong>Что произошло:</strong></p>
+                <ul>
+                    <li>Уязвимость в облачном хранилище крупной компании</li>
+                    <li>Доступ к данным получили хакеры через незакрытый порт</li>
+                    <li>Утекли персональные данные, платежная информация, переписка</li>
+                </ul>
+                <p><strong>Уроки для бизнеса:</strong></p>
+                <ol>
+                    <li>Регулярный аудит безопасности облачных инфраструктур</li>
+                    <li>Обязательное шифрование чувствительных данных</li>
+                    <li>Многофакторная аутентификация для всех административных доступов</li>
+                    <li>План реагирования на инциденты должен быть готов заранее</li>
+                    <li>Обучение сотрудников основам кибербезопасности</li>
+                </ol>
+                <p><strong>Советы для пользователей:</strong></p>
+                <ul>
+                    <li>Используйте разные пароли для разных сервисов</li>
+                    <li>Включите двухфакторную аутентификацию везде, где это возможно</li>
+                    <li>Регулярно проверяйте, не были ли ваши данные скомпрометированы</li>
+                </ul>`}
+            ],
+            
+            development: [
+                {id: 6, category: "Разработка", title: "TypeScript 5.0: новые возможности", excerpt: "Обзор важных изменений в последней мажорной версии TypeScript.", date: "14.10.2023", readTime: "6 мин", author: "Андрей Никитин", image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                fullText: `<p>TypeScript 5.0 принес значительные улучшения в производительность и удобство использования.</p>
+                <p><strong>Основные нововведения:</strong></p>
+                <ul>
+                    <li><strong>Новая система модулей</strong> - улучшенная поддержка ESM (ECMAScript Modules)</li>
+                    <li><strong>Декораторы Stage 3</strong> - теперь соответствуют текущему предложению для JavaScript</li>
+                    <li><strong>Const Type Parameters</strong> - более точный вывод типов для констант</li>
+                    <li><strong>Улучшенная производительность</strong> - компиляция до 2 раз быстрее, использование памяти уменьшено</li>
+                    <li><strong>Поддержка разрешения модулей через <code>moduleResolution: 'bundler'</code></strong></li>
+                </ul>
+                <p><strong>Пример нового синтаксиса:</strong></p>
+                <pre><code>// Декораторы
+@sealed
+class BugReport {
+  @format("Hello, %s")
+  greeting: string;
+  
+  constructor(message: string) {
+    this.greeting = message;
+  }
+  
+  @validate
+  print() {
+    return this.greeting;
+  }
+}</code></pre>
+                <p>TypeScript 5.0 также упрощает конфигурацию - многие флаги стали deprecated в пользу более простых опций.</p>`}
+            ],
+            
+            kids: [
+                {id: 7, category: "Для детей", title: "Python для школьников: первые шаги", excerpt: "Как начать изучать Python с помощью игровых платформ и простых задач.", date: "16.10.2023", readTime: "4 мин", author: "Екатерина Федорова", image: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", kids: true,
+                fullText: `<p>Python - отличный первый язык программирования для детей благодаря своему простому синтаксису.</p>
+                <p><strong>Почему Python подходит детям:</strong></p>
+                <ul>
+                    <li>Читаемый синтаксис, похожий на английский язык</li>
+                    <li>Много библиотек для создания игр и графики</li>
+                    <li>Большое сообщество и учебные материалы</li>
+                </ul>
+                <p><strong>Первые проекты на Python:</strong></p>
+                <ol>
+                    <li><strong>Калькулятор</strong> - научиться работать с числами и вводом данных</li>
+                    <li><strong>Викторина</strong> - использование условий и циклов</li>
+                    <li><strong>Текстовая игра-приключение</strong> - освоение функций и логики</li>
+                    <li><strong>Рисование черепашкой (turtle)</strong> - визуальное программирование</li>
+                    <li><strong>Простая игра на PyGame</strong> - создание "Змейки" или "Крестиков-ноликов"</li>
+                </ol>
+                <p><strong>Пример простой программы:</strong></p>
+                <pre><code># Викторина
+print("Добро пожаловать в викторину!")
+name = input("Как тебя зовут? ")
+print(f"Привет, {name}!")
+
+score = 0
+
+answer = input("Сколько будет 2 + 2? ")
+if answer == "4":
+    print("Правильно!")
+    score += 1
+else:
+    print("Неправильно!")
+
+print(f"Твой счет: {score}")</code></pre>
+                <p>Рекомендуемые ресурсы: Code.org, CheckiO, Codewars (простой уровень).</p>`}
+            ],
+            
+            ai: [
+                {id: 8, category: "Искусственный интеллект", title: "ChatGPT в образовании: возможности и риски", excerpt: "Как искусственный интеллект меняет подход к обучению и какие проблемы возникают.", date: "08.10.2023", readTime: "6 мин", author: "Ирина Соколова", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                fullText: `<p>ИИ-ассистенты типа ChatGPT кардинально меняют образовательный ландшафт, предлагая как новые возможности, так и создавая вызовы.</p>
+                <p><strong>Возможности для образования:</strong></p>
+                <ul>
+                    <li><strong>Персонализированное обучение</strong> - ИИ может адаптировать материал под уровень ученика</li>
+                    <li><strong>Круглосуточный репетитор</strong> - помощь с домашними заданиями в любое время</li>
+                    <li><strong>Развитие критического мышления</strong> - анализ ответов ИИ на предмет ошибок</li>
+                    <li><strong>Автоматизация рутинных задач</strong> - проверка грамматики, генерация тестов</li>
+                </ul>
+                <p><strong>Риски и проблемы:</strong></p>
+                <ul>
+                    <li><strong>Плагиат и обман</strong> - студенты могут сдавать работы, написанные ИИ</li>
+                    <li><strong>Потеря навыков</strong> - чрезмерная зависимость от ИИ может ухудшить самостоятельное мышление</li>
+                    <li><strong>Ошибки и "галлюцинации"</strong> - ИИ может предоставлять неверную информацию уверенным тоном</li>
+                    <li><strong>Этическая проблема авторства</strong> - кто является автором работы, созданной с помощью ИИ?</li>
+                </ul>
+                <p><strong>Рекомендации для преподавателей:</strong></p>
+                <ol>
+                    <li>Внедрять ИИ в учебный процесс осознанно</li>
+                    <li>Учить студентов работать с ИИ критически</li>
+                    <li>Создавать задания, которые требуют личного опыта и размышлений</li>
+                    <li>Использовать инструменты для обнаружения текстов, созданных ИИ</li>
+                    <li>Обсуждать этические аспекты использования ИИ</li>
+                </ol>
+                <p>ИИ - это инструмент, который может как усиливать, так и ослаблять образовательный процесс в зависимости от того, как мы его используем.</p>`}
+            ]
+        };
+
+        // Заглушки для остальных разделов
+        const defaultArticles = [
+            {id: 99, category: "Общее", title: "Раздел в разработке", excerpt: "Содержание этого раздел скоро будет доступно.", date: "01.10.2023", readTime: "1 мин", author: "Редакция", image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            fullText: `<p>Этот раздел находится в активной разработке. Наша команда готовит для вас интересные материалы по этой теме.</p>
+            <p>Скоро здесь появятся:</p>
+            <ul>
+                <li>Экспертные статьи</li>
+                <li>Интервью с профессионалами</li>
+                <li>Практические руководства</li>
+                <li>Новости и обзоры</li>
+            </ul>
+            <p>А пока вы можете ознакомиться с другими разделами нашего журнала или подписаться на рассылку, чтобы первым узнать о новых публикациях.</p>`}
+        ];
+
+        // Названия страниц
+        const pageTitles = {
+            home: "Главная - Последние публикации",
+            news: "Новости IT",
+            development: "Разработка ПО",
+            ai: "Искусственный интеллект",
+            security: "Кибербезопасность",
+            kids: "Программирование для детей",
+            scratch: "Scratch и игровое обучение",
+            robotics: "Робототехника",
+            career: "Карьера в IT",
+            events: "Мероприятия",
+            books: "Книги и ресурсы",
+            about: "О проекте"
+        };
+
+        // Конфигурация рекламных баннеров (легко редактируется)
+        const adConfig = {
+            // Основной баннер
+            mainBanner: {
+                title: "Wasabi Apps Store",
+                description: "Откройте для себя мир качественных приложений для разработчиков, дизайнеров и IT-специалистов.",
+                buttonText: "Перейти в магазин приложений",
+                url: "https://wasabiapps.youware.app",
+                badge: "Рекомендуем",
+                icon: "shopping-bag"
+            },
+            
+            // Боковой баннер
+            sidebarBanner: {
+                title: "Wasabi Apps",
+                description: "Лучшие приложения для разработчиков",
+                buttonText: "Посетить магазин",
+                url: "https://wasabiapps.youware.app",
+                badge: "Реклама",
+                icon: "external-link-alt"
+            },
+            
+            // Малый баннер
+            smallBanner: {
+                title: "Нужны инструменты для работы?",
+                description: "Посетите Wasabi Apps Store для качественных IT-приложений",
+                buttonText: "Посмотреть",
+                url: "https://wasabiapps.youware.app",
+                badge: "Спонсор",
+                icon: "external-link-alt"
+            },
+            
+            // Баннер в модальном окне
+            modalBanner: {
+                title: "Понравилась статья?",
+                description: "Оцените наши рекомендации в Wasabi Apps Store",
+                buttonText: "Посетить магазин",
+                url: "https://wasabiapps.youware.app",
+                badge: "Партнер",
+                icon: "rocket"
+            }
+        };
+
+        // Функция инициализации приложения
+        function initializeApp() {
+            // Элементы DOM
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageTitle = document.getElementById('pageTitle');
+            const articlesGrid = document.getElementById('articlesGrid');
+            const loader = document.getElementById('loader');
+            const articleModal = document.getElementById('articleModal');
+            const modalClose = document.getElementById('modalClose');
+            const modalImage = document.getElementById('modalImage');
+            const modalCategory = document.getElementById('modalCategory');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDate = document.getElementById('modalDate');
+            const modalReadTime = document.getElementById('modalReadTime');
+            const modalAuthor = document.getElementById('modalAuthor');
+            const modalText = document.getElementById('modalText');
+            const modalLike = document.getElementById('modalLike');
+            const modalShare = document.getElementById('modalShare');
+            const modalSave = document.getElementById('modalSave');
+
+            // Текущая выбранная статья
+            let currentArticle = null;
+
+            // Функция для обновления баннеров
+            function updateBanners() {
+                // Главный баннер
+                const mainBanner = document.getElementById('mainBanner');
+                if (mainBanner) {
+                    mainBanner.querySelector('.ad-title').textContent = adConfig.mainBanner.title;
+                    mainBanner.querySelector('.ad-description').textContent = adConfig.mainBanner.description;
+                    mainBanner.querySelector('.ad-button').innerHTML = `<i class="fas fa-${adConfig.mainBanner.icon}"></i> ${adConfig.mainBanner.buttonText}`;
+                    mainBanner.querySelector('.ad-button').href = adConfig.mainBanner.url;
+                    mainBanner.querySelector('.ad-badge').textContent = adConfig.mainBanner.badge;
+                }
+                
+                // Все маленькие баннеры на странице
+                document.querySelectorAll('.ad-banner-small').forEach((banner, index) => {
+                    const config = index === 0 ? adConfig.smallBanner : adConfig.modalBanner;
+                    banner.querySelector('.ad-title').textContent = config.title;
+                    banner.querySelector('.ad-description').textContent = config.description;
+                    banner.querySelector('.ad-button').innerHTML = `<i class="fas fa-${config.icon}"></i> ${config.buttonText}`;
+                    banner.querySelector('.ad-button').href = config.url;
+                    banner.querySelector('.ad-badge').textContent = config.badge;
+                });
+                
+                // Баннер в боковой панели
+                const sidebarBanner = document.querySelector('.ad-banner-sidebar');
+                if (sidebarBanner) {
+                    sidebarBanner.querySelector('.ad-title').textContent = adConfig.sidebarBanner.title;
+                    sidebarBanner.querySelector('.ad-description').textContent = adConfig.sidebarBanner.description;
+                    sidebarBanner.querySelector('.ad-button').innerHTML = `<i class="fas fa-${adConfig.sidebarBanner.icon}"></i> ${adConfig.sidebarBanner.buttonText}`;
+                    sidebarBanner.querySelector('.ad-button').href = adConfig.sidebarBanner.url;
+                    sidebarBanner.querySelector('.ad-badge').textContent = adConfig.sidebarBanner.badge;
+                }
+            }
+
+            // Функция для переключения меню
+            function toggleMenu() {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            }
+
+            // Функция для закрытия меню
+            function closeMenu() {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            }
+
+            // Функция для загрузки статей
+            function loadArticles(page) {
+                // Показываем индикатор загрузки
+                loader.classList.add('active');
+                articlesGrid.innerHTML = '';
+                
+                // Имитируем загрузку данных
+                setTimeout(() => {
+                    const articles = articlesData[page] || defaultArticles;
+                    
+                    if (articles.length === 0) {
+                        articlesGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #777;">Статьи в этом разделе скоро появятся</p>';
+                    } else {
+                        articles.forEach(article => {
+                            const articleCard = document.createElement('div');
+                            articleCard.className = `article-card ${article.kids ? 'kids-category' : ''}`;
+                            articleCard.setAttribute('data-id', article.id);
+                            
+                            articleCard.innerHTML = `
+                                <div class="article-image" style="background-image: url('${article.image}')"></div>
+                                <div class="article-content">
+                                    <div class="article-category">${article.category}</div>
+                                    <h3 class="article-title">${article.title}</h3>
+                                    <p class="article-excerpt">${article.excerpt}</p>
+                                    <div class="article-meta">
+                                        <span>${article.date}</span>
+                                        <span>${article.readTime} чтения</span>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Добавляем обработчик клика для открытия модального окна
+                            articleCard.addEventListener('click', () => openArticleModal(article));
+                            
+                            articlesGrid.appendChild(articleCard);
+                        });
+                    }
+                    
+                    // Обновляем заголовок страницы
+                    pageTitle.textContent = pageTitles[page] || pageTitles.home;
+                    
+                    // Скрываем индикатор загрузки
+                    loader.classList.remove('active');
+                }, 500); // Имитация задержки загрузки
+            }
+
+            // Функция для открытия модального окна с статьей
+            function openArticleModal(article) {
+                currentArticle = article;
+                
+                // Заполняем модальное окно данными статьи
+                modalImage.style.backgroundImage = `url('${article.image}')`;
+                modalCategory.textContent = article.category;
+                modalTitle.textContent = article.title;
+                modalDate.textContent = article.date;
+                modalReadTime.textContent = `${article.readTime} чтения`;
+                modalAuthor.textContent = `Автор: ${article.author}`;
+                modalText.innerHTML = article.fullText;
+                
+                // Обновляем баннер в модальном окне
+                const modalBanner = articleModal.querySelector('.ad-banner-small');
+                if (modalBanner) {
+                    modalBanner.querySelector('.ad-title').textContent = adConfig.modalBanner.title;
+                    modalBanner.querySelector('.ad-description').textContent = adConfig.modalBanner.description;
+                    modalBanner.querySelector('.ad-button').innerHTML = `<i class="fas fa-${adConfig.modalBanner.icon}"></i> ${adConfig.modalBanner.buttonText}`;
+                    modalBanner.querySelector('.ad-button').href = adConfig.modalBanner.url;
+                    modalBanner.querySelector('.ad-badge').textContent = adConfig.modalBanner.badge;
+                }
+                
+                // Показываем модальное окно
+                articleModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Блокируем скролл страницы
+            }
+
+            // Функция для закрытия модального окна
+            function closeArticleModal() {
+                articleModal.classList.remove('active');
+                document.body.style.overflow = ''; // Восстанавливаем скролл
+            }
+
+            // Обновляем все баннеры
+            updateBanners();
+            
+            // Загружаем статьи для главной страницы
+            loadArticles('home');
+            
+            // Обработчики событий для меню
+            menuToggle.addEventListener('click', toggleMenu);
+            sidebarOverlay.addEventListener('click', closeMenu);
+            
+            // Обработчики для навигационных пунктов
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Убираем активный класс у всех пунктов
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    
+                    // Добавляем активный класс к текущему пункту
+                    this.classList.add('active');
+                    
+                    // Загружаем статьи для выбранной страницы
+                    const page = this.getAttribute('data-page');
+                    loadArticles(page);
+                    
+                    // Закрываем меню на мобильных устройствах
+                    if (window.innerWidth < 992) {
+                        closeMenu();
+                    }
+                });
+            });
+            
+            // Обработчики для модального окна
+            modalClose.addEventListener('click', closeArticleModal);
+            
+            // Закрытие модального окна при клике на оверлей
+            articleModal.addEventListener('click', (e) => {
+                if (e.target === articleModal) {
+                    closeArticleModal();
+                }
+            });
+            
+            // Закрытие модального окна при нажатии Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && articleModal.classList.contains('active')) {
+                    closeArticleModal();
+                }
+            });
+            
+            // Обработчики для кнопок в модальном окне
+            modalLike.addEventListener('click', () => {
+                alert(`Статья "${currentArticle.title}" добавлена в понравившиеся!`);
+                modalLike.innerHTML = '<i class="fas fa-thumbs-up"></i> Понравилось!';
+                modalLike.style.backgroundColor = '#27ae60';
+            });
+            
+            modalShare.addEventListener('click', () => {
+                const shareText = `Читаю статью "${currentArticle.title}" на IT Journal`;
+                const shareUrl = window.location.href;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: currentArticle.title,
+                        text: shareText,
+                        url: shareUrl
+                    });
+                } else {
+                    navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+                    alert('Ссылка на статью скопирована в буфер обмена!');
+                }
+            });
+            
+            modalSave.addEventListener('click', () => {
+                alert(`Статья "${currentArticle.title}" сохранена для чтения позже!`);
+                modalSave.innerHTML = '<i class="fas fa-check"></i> Сохранено';
+                modalSave.style.backgroundColor = '#27ae60';
+            });
+        }
+
+        // Закрытие меню при изменении размера окна
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992) {
+                const sidebar = document.getElementById('sidebar');
+                const sidebarOverlay = document.getElementById('sidebarOverlay');
+                
+                if (sidebar) sidebar.classList.add('active');
+                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+            } else {
+                const sidebar = document.getElementById('sidebar');
+                const sidebarOverlay = document.getElementById('sidebarOverlay');
+                
+                if (sidebar) sidebar.classList.remove('active');
+                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
